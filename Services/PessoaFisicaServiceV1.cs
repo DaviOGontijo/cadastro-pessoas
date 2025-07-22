@@ -15,8 +15,12 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
 
     public async Task<(bool Success, string? ErrorMessage, PessoaFisicaReadDtoV1? Result)> CreateAsync(PessoaFisicaCreateDtoV1 dto)
     {
+        var cpfExistente = await _repository.ObterPessoaFisicaPorCpf(dto.CPF);
+
         if (!CpfCnpjValidator.ValidarCPF(dto.CPF))
             return (false, "CPF inválido.", null);
+        if (cpfExistente != null)
+            return (false, "CPF já cadastrado.", null);
 
         var pessoa = new PessoaFisica
         {
@@ -95,6 +99,9 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
         if (pessoaExistente == null)
             return (false, "Pessoa não encontrada.");
 
+        var cpfExistente = await _repository.ObterPessoaFisicaPorCpf(dto.CPF);
+        if (cpfExistente != null && cpfExistente.Id != id)
+            return (false, "CPF já cadastrado para outra pessoa.");
         if (!CpfCnpjValidator.ValidarCPF(dto.CPF))
             return (false, "CPF inválido.");
 

@@ -18,5 +18,8 @@ namespace CadastroPessoasApi.Repositories
 
         Task DeletarPessoaFisica(PessoaFisica pessoaFisica);
         Task DeletarPessoaJuridica(PessoaJuridica pessoaJuridica);
+
+        Task<PessoaFisica?> ObterPessoaFisicaPorCpf(string cpf);
+        Task<PessoaJuridica?> ObterPessoaJuridicaPorCnpj(string cnpj);
     }
 }

@@ -15,6 +15,9 @@ public class PessoaJuridicaServiceV1 : IPessoaJuridicaServiceV1
 
     public async Task<(bool Success, string? ErrorMessage, PessoaJuridicaReadDtoV1? Result)> CreateAsync(PessoaJuridicaCreateDtoV1 dto)
     {
+        var cnpjExistente = await _repository.ObterPessoaJuridicaPorCnpj(dto.CNPJ);
+        if (cnpjExistente != null)
+            return (false, "CNPJ já cadastrado.", null);
         if (!CpfCnpjValidator.ValidarCNPJ(dto.CNPJ))
             return(false, "CNPJ inválido.", null);
 
@@ -82,6 +85,10 @@ public class PessoaJuridicaServiceV1 : IPessoaJuridicaServiceV1
         var pessoaExistente = await _repository.ObterPessoaJuridicaPorId(id);
         if (pessoaExistente == null)
             return (false, "Empresa não encontrada");
+
+        var cnpjExistente = await _repository.ObterPessoaJuridicaPorCnpj(dto.CNPJ);
+        if (cnpjExistente != null && cnpjExistente.Id != id)
+            return (false, "CNPJ já cadastrado para outra empresa.");
         if (!CpfCnpjValidator.ValidarCNPJ(dto.CNPJ))
             return(false, "CNPJ inválido.");
 

@@ -88,7 +88,7 @@ public class ConfigureSwaggerOptions : Microsoft.Extensions.Options.IConfigureOp
         {
             options.SwaggerDoc(desc.GroupName, new OpenApiInfo
             {
-                Title = $"Minha API {desc.GroupName.ToUpperInvariant()}",
+                Title = $"Gerenciador de Pessoas {desc.GroupName.ToUpperInvariant()}",
                 Version = desc.GroupName
             });
         }

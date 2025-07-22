@@ -77,5 +77,17 @@ namespace CadastroPessoasApi.Repositories
             _context.Pessoas.Remove(pessoaJuridica);
             await _context.SaveChangesAsync();
         }
+        public async Task<PessoaFisica?> ObterPessoaFisicaPorCpf(string cpf)
+        {
+            return await _context.Pessoas
+                .OfType<PessoaFisica>()
+                .FirstOrDefaultAsync(p => p.CPF == cpf);
+        }
+        public async Task<PessoaJuridica?> ObterPessoaJuridicaPorCnpj(string cnpj)
+        {
+            return await _context.Pessoas
+                .OfType<PessoaJuridica>()
+                .FirstOrDefaultAsync(p => p.CNPJ == cnpj);
+        }
     }
 }

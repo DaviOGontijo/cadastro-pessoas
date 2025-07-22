@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CadastroPessoasApi.Migrations
 {
     [DbContext(typeof(PessoaDbContext))]
-    [Migration("20250721213419_InitialMigration")]
+    [Migration("20250722203421_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace CadastroPessoasApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Cidade")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Complemento")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Estado")

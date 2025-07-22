@@ -14,6 +14,7 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 - ✅ DTOs para entrada e saída
 - ✅ Table-per-hierarchy (TPH) com herança
 - ✅ Estrutura separada para Pessoa Física e Jurídica
+- ✅ Separação por camadas (Controllers, Services, Repositories, Validators)
 
 ---
 
@@ -26,19 +27,33 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
   PessoaJuridica.cs
 /Models/Enums
   TipoPessoa.cs
-/DTOs
-  PessoaFisicaCreateDto.cs
-  PessoaFisicaReadDto.cs
-  PessoaJuridicaCreateDto.cs
-  PessoaJuridicaReadDto.cs
+/DTOs/V1
+  PessoaFisicaCreateDtoV1.cs
+  PessoaFisicaReadDtoV1.cs
+  PessoaJuridicaCreateDtoV1.cs
+  PessoaJuridicaReadDtoV1.cs
+/DTOs/V2
+  PessoaFisicaCreateDtoV2.cs
+  PessoaFisicaReadDtoV2.cs
 /Data
   PessoaDbContext.cs
 /Repositories
   IPessoaRepository.cs
   PessoaRepository.cs
-/Controllers
-  PessoaFisicaController.cs
-  PessoaJuridicaController.cs
+/Services
+  IPessoaFisicaServiceV1.cs
+  PessoaFisicaServiceV1.cs
+  IPessoaJuridicaServiceV1.cs
+  PessoaJuridicaServiceV1.cs
+  IPessoaFisicaServiceV2.cs
+  PessoaFisicaServiceV2.cs
+  IPessoaJuridicaServiceV2.cs
+  PessoaJuridicaServiceV2.cs
+/Controllers/V1
+  PessoaFisicaControllerV1.cs
+  PessoaJuridicaControllerV1.cs
+/Controllers/V2
+  PessoaFisicaControllerV2.cs
 /Validators
   CpfCnpjValidator.cs
 ```
@@ -48,18 +63,18 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 ## 🧠 Funcionalidades
 
 ### Pessoa Física
-- Criar (`POST /api/pessoafisica`)
-- Buscar por ID (`GET /api/pessoafisica/{id}`)
-- Listar todas (`GET /api/pessoafisica`)
-- Atualizar (`PUT /api/pessoafisica/{id}`)
-- Deletar (`DELETE /api/pessoafisica/{id}`)
+- Criar (`POST /api/v1/pessoafisica`)
+- Buscar por ID (`GET /api/v1/pessoafisica/{id}`)
+- Listar todas (`GET /api/v1/pessoafisica`)
+- Atualizar (`PUT /api/v1/pessoafisica/{id}`)
+- Deletar (`DELETE /api/v1/pessoafisica/{id}`)
 
 ### Pessoa Jurídica
-- Criar (`POST /api/pessoajuridica`)
-- Buscar por ID (`GET /api/pessoajuridica/{id}`)
-- Listar todas (`GET /api/pessoajuridica`)
-- Atualizar (`PUT /api/pessoajuridica/{id}`)
-- Deletar (`DELETE /api/pessoajuridica/{id}`)
+- Criar (`POST /api/v1/pessoajuridica`)
+- Buscar por ID (`GET /api/v1/pessoajuridica/{id}`)
+- Listar todas (`GET /api/v1/pessoajuridica`)
+- Atualizar (`PUT /api/v1/pessoajuridica/{id}`)
+- Deletar (`DELETE /api/v1/pessoajuridica/{id}`)
 
 ---
 
@@ -67,8 +82,8 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/DaviOGontijo/cadastro-pessoas-api
+cd cadastro-pessoas-api
 ```
 
 ### 2. Restaure os pacotes
@@ -101,10 +116,6 @@ https://localhost:5001/swagger
 > ⚠️ O Swagger está habilitado para produção também.
 
 ---
-
-
-
-
 
 ## 🧑‍💻 Desenvolvedor
 

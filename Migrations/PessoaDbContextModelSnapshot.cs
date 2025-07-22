@@ -32,6 +32,9 @@ namespace CadastroPessoasApi.Migrations
                     b.Property<string>("Cidade")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Complemento")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Estado")
                         .HasColumnType("TEXT");
 

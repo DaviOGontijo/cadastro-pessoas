@@ -1,78 +1,61 @@
-﻿namespace CadastroPessoasApi.Validators
+﻿using System.Text.RegularExpressions;
+
+namespace CadastroPessoasApi.Validators
 {
     public static class CpfCnpjValidator
     {
         public static bool ValidarCPF(string cpf)
         {
-            if (string.IsNullOrEmpty(cpf))
+            cpf = SomenteNumeros(cpf);
+
+            if (cpf.Length != 11 || TodosDigitosIguais(cpf))
                 return false;
 
-            if (cpf.Length != 11)
-                return false;
+            var multiplicador1 = new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            var multiplicador2 = new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-            if (new string(cpf[0], cpf.Length) == cpf)
-                return false;
-
-            int[] multiplicador1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-            int[] multiplicador2 = { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-
-            string tempCpf = cpf.Substring(0, 9);
-            int soma = 0;
-
-            for (int i = 0; i < 9; i++)
-                soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
-
-            int resto = soma % 11;
-            int digito1 = (resto < 2) ? 0 : 11 - resto;
+            string tempCpf = cpf[..9];
+            int digito1 = CalcularDigitoVerificador(tempCpf, multiplicador1);
 
             tempCpf += digito1;
-            soma = 0;
+            int digito2 = CalcularDigitoVerificador(tempCpf, multiplicador2);
 
-            for (int i = 0; i < 10; i++)
-                soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
-
-            resto = soma % 11;
-            int digito2 = (resto < 2) ? 0 : 11 - resto;
-
-            string digitosVerificadores = cpf.Substring(9, 2);
-            return digitosVerificadores == $"{digito1}{digito2}";
+            return cpf.EndsWith($"{digito1}{digito2}");
         }
-
 
         public static bool ValidarCNPJ(string cnpj)
         {
-            if (string.IsNullOrEmpty(cnpj))
+            cnpj = SomenteNumeros(cnpj);
+
+            if (cnpj.Length != 14 || TodosDigitosIguais(cnpj))
                 return false;
 
-            if (cnpj.Length != 14)
-                return false;
+            var multiplicador1 = new[] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+            var multiplicador2 = new[] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-            if (new string(cnpj[0], cnpj.Length) == cnpj)
-                return false;
-
-            int[] multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-            int[] multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-
-            string tempCnpj = cnpj.Substring(0, 12);
-            int soma = 0;
-
-            for (int i = 0; i < 12; i++)
-                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador1[i];
-
-            int resto = soma % 11;
-            int digito1 = (resto < 2) ? 0 : 11 - resto;
+            string tempCnpj = cnpj[..12];
+            int digito1 = CalcularDigitoVerificador(tempCnpj, multiplicador1);
 
             tempCnpj += digito1;
-            soma = 0;
+            int digito2 = CalcularDigitoVerificador(tempCnpj, multiplicador2);
 
-            for (int i = 0; i < 13; i++)
-                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador2[i];
-
-            resto = soma % 11;
-            int digito2 = (resto < 2) ? 0 : 11 - resto;
-
-            string digitosVerificadores = cnpj.Substring(12, 2);
-            return digitosVerificadores == $"{digito1}{digito2}";
+            return cnpj.EndsWith($"{digito1}{digito2}");
         }
+
+        private static int CalcularDigitoVerificador(string input, int[] multiplicadores)
+        {
+            int soma = 0;
+            for (int i = 0; i < multiplicadores.Length; i++)
+                soma += int.Parse(input[i].ToString()) * multiplicadores[i];
+
+            int resto = soma % 11;
+            return (resto < 2) ? 0 : 11 - resto;
+        }
+
+        private static bool TodosDigitosIguais(string valor)
+            => valor.Distinct().Count() == 1;
+
+        private static string SomenteNumeros(string valor)
+            => Regex.Replace(valor ?? string.Empty, "[^0-9]", "");
     }
 }

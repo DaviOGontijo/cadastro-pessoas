@@ -43,6 +43,7 @@ namespace CadastroPessoasApi.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Logradouro = table.Column<string>(type: "TEXT", nullable: true),
                     Numero = table.Column<string>(type: "TEXT", nullable: true),
+                    Complemento = table.Column<string>(type: "TEXT", nullable: true),
                     Bairro = table.Column<string>(type: "TEXT", nullable: true),
                     Cidade = table.Column<string>(type: "TEXT", nullable: true),
                     Estado = table.Column<string>(type: "TEXT", nullable: true),

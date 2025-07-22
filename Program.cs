@@ -5,14 +5,15 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SQLite
+// Configuração do DbContext com SQLite
 builder.Services.AddDbContext<PessoaDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Versionamento
+// Configuração do versionamento de API
 builder.Services.AddApiVersioning(opt =>
 {
     opt.AssumeDefaultVersionWhenUnspecified = true;
@@ -20,23 +21,34 @@ builder.Services.AddApiVersioning(opt =>
     opt.ReportApiVersions = true;
 });
 
-// Exploração de versão para Swagger
+// Configuração para explorar versões no Swagger
 builder.Services.AddVersionedApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
 
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
+// Configuração do Swagger com inclusão de comentários XML (opcional)
 builder.Services.AddSwaggerGen(options =>
 {
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
 
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
+// Registro de serviços
 builder.Services.AddControllers();
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
+
+builder.Services.AddScoped<IPessoaFisicaServiceV1, PessoaFisicaServiceV1>();
+builder.Services.AddScoped<IPessoaFisicaServiceV2, PessoaFisicaServiceV2>();
+builder.Services.AddScoped<IPessoaJuridicaServiceV1, PessoaJuridicaServiceV1>();
+builder.Services.AddScoped<IPessoaJuridicaServiceV2, PessoaJuridicaServiceV2>();
 
 var app = builder.Build();
 
@@ -53,6 +65,7 @@ app.UseSwaggerUI(options =>
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
 
@@ -79,6 +92,5 @@ public class ConfigureSwaggerOptions : Microsoft.Extensions.Options.IConfigureOp
                 Version = desc.GroupName
             });
         }
-
     }
 }

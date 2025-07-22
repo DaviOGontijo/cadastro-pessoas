@@ -1,113 +1,64 @@
 ﻿using CadastroPessoasApi.DTOs.V1;
-using CadastroPessoasApi.Models;
-using CadastroPessoasApi.Models.Enums;
-using CadastroPessoasApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using CadastroPessoasApi.Validators;
 
-namespace CadastroPessoasApi.Controllers.v1;
-
-[ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
-[ApiController]
-public class PessoaJuridicaController : ControllerBase
+namespace CadastroPessoasApi.Controllers.V1
 {
-    private readonly IPessoaRepository _repository;
-
-    public PessoaJuridicaController(IPessoaRepository repository)
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiController]
+    public class PessoaJuridicaController : ControllerBase
     {
-        _repository = repository;
-    }
+        private readonly IPessoaJuridicaServiceV1 _service;
 
-    [HttpPost]
-    public async Task<ActionResult<PessoaJuridicaReadDtoV1>> Create(PessoaJuridicaCreateDtoV1 dto)
-    {
-        var pessoa = new PessoaJuridica
+        public PessoaJuridicaController(IPessoaJuridicaServiceV1 service)
         {
-            Nome = dto.Nome,
-            Email = dto.Email,
-            CNPJ = dto.CNPJ,
-            RazaoSocial = dto.RazaoSocial,
-            Tipo = TipoPessoa.Juridica,
-            DataCadastro = DateTime.UtcNow,
-            DataAtualizacao = DateTime.UtcNow
-        };
+            _service = service;
+        }
 
-        await _repository.AdicionarPessoaJuridica(pessoa);
-
-        return CreatedAtAction(nameof(GetById), new { id = pessoa.Id }, new PessoaJuridicaReadDtoV1
+        [HttpPost]
+        public async Task<ActionResult<PessoaJuridicaReadDtoV1>> Create(PessoaJuridicaCreateDtoV1 dto)
         {
-            Id = pessoa.Id,
-            Nome = pessoa.Nome,
-            Email = pessoa.Email,
-            CNPJ = pessoa.CNPJ,
-            RazaoSocial = pessoa.RazaoSocial,
-            DataCadastro = pessoa.DataCadastro,
-            DataAtualizacao = pessoa.DataAtualizacao
-        });
-    }
+            var (success, errorMessage, result) = await _service.CreateAsync(dto);
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<PessoaJuridicaReadDtoV1>> GetById(int id)
-    {
-        var pessoa = await _repository.ObterPessoaJuridicaPorId(id);
-        if (pessoa == null) return NotFound();
+            if (!success)
+            {
+                return BadRequest(errorMessage);
+            }
 
-        return Ok(new PessoaJuridicaReadDtoV1
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PessoaJuridicaReadDtoV1>> GetById(int id)
         {
-            Id = pessoa.Id,
-            Nome = pessoa.Nome,
-            Email = pessoa.Email,
-            CNPJ = pessoa.CNPJ,
-            RazaoSocial = pessoa.RazaoSocial,
-            DataCadastro = pessoa.DataCadastro,
-            DataAtualizacao = pessoa.DataAtualizacao
-        });
-    }
+            var result = await _service.GetByIdAsync(id);
+            return result == null ? NotFound() : Ok(result);
+        }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<PessoaJuridicaReadDtoV1>>> GetAll()
-    {
-        var pessoas = await _repository.ObterTodasPessoasJuridicas();
-
-        return Ok(pessoas.Select(p => new PessoaJuridicaReadDtoV1
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PessoaJuridicaReadDtoV1>>> GetAll()
         {
-            Id = p.Id,
-            Nome = p.Nome,
-            Email = p.Email,
-            CNPJ = p.CNPJ,
-            RazaoSocial = p.RazaoSocial,
-            DataCadastro = p.DataCadastro,
-            DataAtualizacao = p.DataAtualizacao
-        }));
-    }
+            var result = await _service.GetAllAsync();
+            return Ok(result);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, PessoaJuridicaCreateDtoV1 dto)
-    {
-        var pessoaExistente = await _repository.ObterPessoaJuridicaPorId(id);
-        if (pessoaExistente == null)
-            return NotFound();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, PessoaJuridicaCreateDtoV1 dto)
+        {
+            var (Success, ErrorMessage) = await _service.UpdateAsync(id, dto);
+            if (!Success)
+            {
+                return BadRequest(ErrorMessage);
+            }
+            return Success ? NoContent() : NotFound();
+        }
 
-        pessoaExistente.Nome = dto.Nome;
-        pessoaExistente.Email = dto.Email;
-        pessoaExistente.CNPJ = dto.CNPJ;
-        pessoaExistente.RazaoSocial = dto.RazaoSocial;
-        pessoaExistente.DataAtualizacao = DateTime.UtcNow;
-
-        await _repository.AtualizarPessoaJuridica(pessoaExistente);
-
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var pessoaExistente = await _repository.ObterPessoaJuridicaPorId(id);
-        if (pessoaExistente == null)
-            return NotFound();
-
-        await _repository.DeletarPessoaJuridica(pessoaExistente);
-
-        return NoContent();
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _service.DeleteAsync(id);
+            return success ? NoContent() : NotFound();
+        }
     }
 }

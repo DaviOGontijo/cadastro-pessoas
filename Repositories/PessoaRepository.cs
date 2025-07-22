@@ -27,22 +27,34 @@ namespace CadastroPessoasApi.Repositories
 
         public async Task<PessoaFisica?> ObterPessoaFisicaPorId(int id)
         {
-            return await _context.Pessoas.OfType<PessoaFisica>().FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Pessoas
+                .OfType<PessoaFisica>()
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<PessoaFisica>> ObterTodasPessoasFisicas()
         {
-            return await _context.Pessoas.OfType<PessoaFisica>().ToListAsync();
+            return await _context.Pessoas
+                .OfType<PessoaFisica>()
+                .Include(p => p.Endereco)
+                .ToListAsync();
         }
 
         public async Task<PessoaJuridica?> ObterPessoaJuridicaPorId(int id)
         {
-            return await _context.Pessoas.OfType<PessoaJuridica>().FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Pessoas
+                .OfType<PessoaJuridica>()
+                .Include(p => p.Endereco)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<PessoaJuridica>> ObterTodasPessoasJuridicas()
         {
-            return await _context.Pessoas.OfType<PessoaJuridica>().ToListAsync();
+            return await _context.Pessoas
+                .OfType<PessoaJuridica>()
+                .Include(p => p.Endereco)
+                .ToListAsync();
         }
         public async Task AtualizarPessoaFisica(PessoaFisica pessoaFisica)
         {

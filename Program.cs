@@ -1,11 +1,17 @@
 using CadastroPessoasApi.Data;
 using CadastroPessoasApi.Repositories;
+using CadastroPessoasApi.Configurations;
+using CadastroPessoasApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,18 +43,62 @@ builder.Services.AddSwaggerGen(options =>
     {
         options.IncludeXmlComments(xmlPath);
     }
+    //Adicionar o campo "Authorization" no Swagger
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        Scheme = JwtBearerDefaults.AuthenticationScheme,     // "Bearer"
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Description = "Insira apenas o token JWT",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+    options.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+{
+    { jwtSecurityScheme, Array.Empty<string>() }
 });
-
+});
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
+// Configuração do JWT
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+    var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
 
 // Registro de serviços
 builder.Services.AddControllers();
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
-
 builder.Services.AddScoped<IPessoaFisicaServiceV1, PessoaFisicaServiceV1>();
 builder.Services.AddScoped<IPessoaFisicaServiceV2, PessoaFisicaServiceV2>();
 builder.Services.AddScoped<IPessoaJuridicaServiceV1, PessoaJuridicaServiceV1>();
 builder.Services.AddScoped<IPessoaJuridicaServiceV2, PessoaJuridicaServiceV2>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
@@ -64,6 +114,7 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

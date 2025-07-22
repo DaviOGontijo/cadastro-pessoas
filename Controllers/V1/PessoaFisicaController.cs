@@ -1,9 +1,10 @@
 ﻿using CadastroPessoasApi.DTOs.V1;
 using Microsoft.AspNetCore.Mvc;
-using CadastroPessoasApi.Validators;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CadastroPessoasApi.Controllers.V1
 {
+    [Authorize]
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]

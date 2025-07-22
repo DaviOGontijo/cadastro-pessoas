@@ -3,6 +3,7 @@ using System;
 using CadastroPessoasApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CadastroPessoasApi.Migrations
 {
     [DbContext(typeof(PessoaDbContext))]
-    partial class PessoaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722213302_CreateUserTable")]
+    partial class CreateUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -91,7 +94,10 @@ namespace CadastroPessoasApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")

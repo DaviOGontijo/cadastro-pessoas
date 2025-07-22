@@ -10,7 +10,7 @@ public class PessoaDbContext : DbContext
 
     public DbSet<PessoaBase> Pessoas { get; set; } = null!;
     public DbSet<Endereco> Enderecos { get; set; } = null!;
-    
+    public DbSet<User> Users { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<PessoaBase>()

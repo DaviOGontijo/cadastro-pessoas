@@ -18,7 +18,7 @@ export function useRegister() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://localhost:5001/api/Auth/register', {
+      const response = await fetch('https://cadastropessoasapi.azurewebsites.net/api/Auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

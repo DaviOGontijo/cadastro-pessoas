@@ -1,20 +1,20 @@
 
-# 📋 Cadastro de Pessoas - Fullstack (.NET 6 + React)
+# 📋 Cadastro de Pessoas - Fullstack (.NET 9 + React)
 
-Este repositório contém a aplicação completa de **Cadastro de Pessoas**, com backend em ASP.NET 6 e frontend em React + Vite. O objetivo é demonstrar uma arquitetura separada por camadas e consumo de API RESTful com autenticação JWT.
+Este repositório contém a aplicação completa de **Cadastro de Pessoas**, com backend em ASP.NET 9 e frontend em React + Vite. O objetivo é demonstrar uma arquitetura separada por camadas e consumo de API RESTful com autenticação JWT.
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-- `/cadastro-pessoas-api`  → Backend (.NET 6 Web API)
-- `/cadastro-pessoas-frontend` → Frontend (React + Vite)
+- `/backend`  → Backend (.NET 9 Web API)
+- `/frontend` → Frontend (React + Vite)
 
 ---
 
 ## 🔗 Repositórios Individuais
 
-- [📦 Backend (ASP.NET 6)](./backend/README.md)
+- [📦 Backend (ASP.NET 9)](./backend/CadastroPessoasApi/README.md)
 - [💻 Frontend (React + Vite)](./frontend/README.md)
 
 ---
@@ -27,7 +27,7 @@ git clone https://github.com/DaviOGontijo/cadastro-pessoas
 cd cadastro-pessoas
 ```
 
-### 2. Rode o backend (.NET 6)
+### 2. Rode o backend (.NET 9)
 ```bash
 cd backend
 dotnet restore

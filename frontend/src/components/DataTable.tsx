@@ -1,19 +1,21 @@
+// DataTable.tsx
 import React from 'react';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper,
   IconButton, TextField, Box, TablePagination, Button,
-  TableSortLabel, InputAdornment, Skeleton
+  TableSortLabel, InputAdornment, Skeleton, Tooltip
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
+import { useTableData } from '../hooks/useTableData';
 
 export type Column<T> = {
   field: keyof T;
   headerName: string;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: T[keyof T], row: T) => React.ReactNode;
 };
 
 type DataTableProps<T> = {
@@ -23,7 +25,7 @@ type DataTableProps<T> = {
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
   onAdd?: () => void;
-  loading?: boolean; // nova prop
+  loading?: boolean;
 };
 
 export function DataTable<T extends { id: string }>({
@@ -35,23 +37,10 @@ export function DataTable<T extends { id: string }>({
   const [order, setOrder] = React.useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof T | null>(null);
 
-  const filtered = rows.filter(row => filterField(row, filter));
-
-  const sorted = React.useMemo(() => {
-    if (!orderBy) return filtered;
-    return [...filtered].sort((a, b) => {
-      const aVal = a[orderBy];
-      const bVal = b[orderBy];
-      const cmp = typeof aVal === 'number' && typeof bVal === 'number'
-        ? aVal - bVal
-        : String(aVal).localeCompare(String(bVal), undefined, { numeric: true });
-      return order === 'asc' ? cmp : -cmp;
-    });
-  }, [filtered, orderBy, order]);
-  const paged = sorted.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+  const { paged, filteredCount } = useTableData(rows, filter, filterField, orderBy, order, page, rowsPerPage);
 
   const handleSort = (field: keyof T) => {
-    if (loading) return; // bloqueia sort no loading
+    if (loading) return;
     const isAsc = orderBy === field && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(field);
@@ -59,7 +48,6 @@ export function DataTable<T extends { id: string }>({
 
   const colSpanCount = columns.length + (onEdit || onDelete ? 1 : 0);
 
-  // Linha skeleton para o loading
   const renderSkeletonRow = (index: number) => (
     <TableRow key={`skeleton-${index}`}>
       {columns.map((col, i) => (
@@ -73,7 +61,7 @@ export function DataTable<T extends { id: string }>({
 
   return (
     <>
-      <Box  sx={{ display: 'flex', mb: 2, gap: 1 }}>
+      <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
         <TextField
           placeholder="Buscar..."
           variant="outlined"
@@ -128,22 +116,29 @@ export function DataTable<T extends { id: string }>({
                 : paged.length > 0
                   ? paged.map(row => (
                     <TableRow hover key={row.id}>
-                      {columns.map(col => (
-                        <TableCell key={String(col.field)}>
-                          {col.render ? col.render(row[col.field], row) : (row[col.field] as any)}
-                        </TableCell>
-                      ))}
+                      {columns.map(col => {
+                        const cellValue = row[col.field];
+                        return (
+                          <TableCell key={String(col.field)}>
+                            {col.render ? col.render(cellValue, row) : String(cellValue)}
+                          </TableCell>
+                        );
+                      })}
                       {(onEdit || onDelete) && (
                         <TableCell align="right">
                           {onEdit && (
-                            <IconButton onClick={() => onEdit(row)} size="small">
-                              <EditIcon fontSize="small" />
-                            </IconButton>
+                            <Tooltip title="Editar">
+                              <IconButton onClick={() => onEdit(row)} size="small" disabled={loading}>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                           )}
                           {onDelete && (
-                            <IconButton onClick={() => onDelete(row)} size="small">
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            <Tooltip title="Excluir">
+                              <IconButton onClick={() => onDelete(row)} size="small" disabled={loading}>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                           )}
                         </TableCell>
                       )}
@@ -163,7 +158,7 @@ export function DataTable<T extends { id: string }>({
         <TablePagination
           rowsPerPageOptions={[10, 25, 50]}
           component="div"
-          count={filtered.length}
+          count={filteredCount}
           rowsPerPage={rowsPerPage}
           page={page}
           colSpan={colSpanCount}

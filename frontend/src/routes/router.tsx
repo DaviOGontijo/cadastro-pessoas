@@ -1,25 +1,10 @@
-// src/routes/router.tsx
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import App from '../App';
+import { createBrowserRouter} from 'react-router-dom';
 import Home from '../pages/home/Home';
 import MainLayout from '../layouts/MainLayout';
 import LoginPage from '../pages/login/Login';
+import Register from '../pages/register/register';
 import LoginLayout from '../layouts/LoginLayout';
-
-function getUser() {
-  const raw = localStorage.getItem('user');
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-function isAuthenticated() {
-  const user = getUser();
-  return !!user?.token;
-}
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -28,19 +13,21 @@ const router = createBrowserRouter([
       {
         children: [
           { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <Register /> },
         ],
       },
     ],
   },
   {
-    element: (
-        <MainLayout />
-    ),
+    element: <MainLayout />,
     children: [
       {
-        children: [
-          { path: '/', element: <Home /> },
-        ],
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

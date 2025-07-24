@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
-  AlertColor,
   Box,
   Collapse,
   Container,
   IconButton,
   LinearProgress,
   Typography,
-  Chip
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -16,114 +14,40 @@ import { DataTable, Column } from '../../components/DataTable';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { PessoaDialog } from '../../components/PessoaDialog';
 
-import {
-  getPessoa,
-  createPessoa,
-  updatePessoa,
-  deletePessoa,
-  getPessoaById
-} from '../../services/pessoaFisicaService';
-
 import { Pessoa } from '../../types/pessoa';
-
-type PessoaRow = {
-  id: string;
-  nome: string;
-  cpf: string;
-  email: string;
-  idPessoa: number;
-};
+import { usePessoas, PessoaRow } from '../../hooks/usePessoas';
+import { usePessoaForm } from '../../hooks/usePessoaForm';
 
 export default function Pessoas() {
-  const [rows, setRows] = useState<PessoaRow[]>([]);
+  const {
+    rows,
+    loading,
+    alertMsg,
+    alertType,
+    showAlert,
+    load,
+    savePessoa,
+    fetchPessoaById,
+    deletePessoaById,
+  } = usePessoas();
+
+  const {
+    form,
+    formTouched,
+    cpfError,
+    emailError,
+    handleChange,
+    handleEnderecoChange,
+    handleSave,
+    resetForm,
+  } = usePessoaForm();
+
   const [editRow, setEditRow] = useState<Pessoa | null>(null);
   const [deleteRow, setDeleteRow] = useState<PessoaRow | null>(null);
-  const [loadingPessoa, setLoadingPessoa] = useState(false);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
-
-  const [alertMsg, setAlertMsg] = useState('');
-  const [alertType, setAlertType] = useState<AlertColor>('success');
-  const [loading, setLoading] = useState(false);
-
-  const showAlert = (msg: string, type: AlertColor = 'success') => {
-    setAlertMsg(msg);
-    setAlertType(type);
-    setTimeout(() => setAlertMsg(''), 3000);
-  };
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const pessoa = await getPessoa(); // supondo que retorna uma pessoa ou lista (verifique)
-      const data: Pessoa[] = Array.isArray(pessoa) ? pessoa : [pessoa];
-
-      const mapped = data.map(p => ({
-        id: String(p.id),
-        nome: p.nome,
-        cpf: p.cpf,
-        email: p.email,
-        idPessoa: p.id
-      }));
-
-      setRows(mapped);
-    } catch (err) {
-      console.error('Erro ao carregar pessoas', err);
-      showAlert('Erro ao carregar pessoas', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleSubmit = async (data: Pessoa) => {
-    try {
-      if (data.id) {
-        await updatePessoa(data.id, data);
-        showAlert(`Pessoa ${data.nome} editada com sucesso`);
-      } else {
-        await createPessoa(data);
-        showAlert(`Pessoa ${data.nome} cadastrada com sucesso`);
-      }
-      setOpenDialog(false);
-      load();
-    } catch (err) {
-      console.error('Erro ao salvar pessoa:', err);
-      showAlert('Erro ao salvar pessoa. Contate o administrador.', 'error');
-    }
-  };
-  const handleEdit = async (row: { id: string }) => {
-    try {
-      setLoadingPessoa(true);
-      const pessoaCompleta = await getPessoaById(Number(row.id));
-      setEditRow(pessoaCompleta);
-      setOpenDialog(true);
-    } catch (err) {
-      console.error('Erro ao buscar pessoa:', err);
-      showAlert('Erro ao buscar dados da pessoa.', 'error');
-    } finally {
-      setLoadingPessoa(false);
-    }
-  };
-  const handleDelete = async () => {
-    if (deleteRow) {
-      try {
-        await deletePessoa(deleteRow.idPessoa);
-        showAlert(`Pessoa ${deleteRow.nome} excluída com sucesso`);
-      } catch (err) {
-        console.error('Erro ao excluir pessoa:', err);
-        showAlert(`Erro ao excluir pessoa ${deleteRow.nome}`, 'error');
-      } finally {
-        setDeleteRow(null);
-        setOpenConfirm(false);
-        load();
-      }
-    }
-  };
+  const [loadingPessoa, setLoadingPessoa] = useState(false);
 
   const columns: Column<PessoaRow>[] = [
     { field: 'id', headerName: 'ID' },
@@ -131,6 +55,38 @@ export default function Pessoas() {
     { field: 'cpf', headerName: 'CPF' },
     { field: 'email', headerName: 'Email' },
   ];
+
+  const onSubmit = async (data: Pessoa) => {
+    try {
+      await savePessoa(data);
+      setOpenDialog(false);
+      resetForm();
+    } catch {
+      // O erro já é tratado no hook
+    }
+  };
+
+  const handleEdit = async (row: PessoaRow) => {
+    setLoadingPessoa(true);
+    try {
+      const pessoaCompleta = await fetchPessoaById(Number(row.id));
+      setEditRow(pessoaCompleta);
+      setOpenDialog(true);
+    } catch {
+      // erro tratado no hook
+    } finally {
+      setLoadingPessoa(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deletePessoaById(deleteRow);
+    } finally {
+      setDeleteRow(null);
+      setOpenConfirm(false);
+    }
+  };
 
   return (
     <Container>
@@ -148,10 +104,10 @@ export default function Pessoas() {
 
       <Collapse in={!!alertMsg}>
         <Alert
-          variant='filled'
+          variant="filled"
           severity={alertType}
           sx={{ mb: 2 }}
-          onClose={() => setAlertMsg('')}
+          onClose={() => showAlert('')}
         >
           {alertMsg}
         </Alert>
@@ -168,12 +124,13 @@ export default function Pessoas() {
           )
         }
         onEdit={handleEdit}
-        onDelete={row => {
+        onDelete={(row) => {
           setDeleteRow(row);
           setOpenConfirm(true);
         }}
         onAdd={() => {
           setEditRow(null);
+          resetForm();
           setOpenDialog(true);
         }}
         loading={loading}
@@ -182,8 +139,11 @@ export default function Pessoas() {
       <PessoaDialog
         open={openDialog}
         initial={editRow || undefined}
-        onClose={() => { setOpenDialog(false); setEditRow(null); }}
-        onSubmit={handleSubmit}
+        onClose={() => {
+          setOpenDialog(false);
+          setEditRow(null);
+        }}
+        onSubmit={onSubmit}
       />
 
       <ConfirmDialog
@@ -191,7 +151,7 @@ export default function Pessoas() {
         title="Confirmar Exclusão"
         message={`Deseja realmente excluir "${deleteRow?.nome}" ?`}
         onCancel={() => setOpenConfirm(false)}
-        onConfirm={handleDelete}
+        onConfirm={handleDeleteConfirm}
       />
     </Container>
   );

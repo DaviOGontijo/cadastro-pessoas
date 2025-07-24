@@ -16,6 +16,7 @@ type Props = {
   message: string;
   onCancel: () => void;
   onConfirm: () => void;
+  confirmButtonText?: string;
 };
 
 export function ConfirmDialog({
@@ -24,8 +25,10 @@ export function ConfirmDialog({
   message,
   onCancel,
   onConfirm,
+  confirmButtonText,
 }: Props) {
-  const confirmLabel = title.startsWith('Excluir') ? 'Excluir' : 'Confirmar';
+  const formattedTitle = title.endsWith('?') ? title : `${title}?`;
+  const confirmLabel = confirmButtonText || (title.startsWith('Excluir') ? 'Excluir' : 'Confirmar');
 
   return (
     <Dialog
@@ -40,7 +43,7 @@ export function ConfirmDialog({
         <Box display="flex" alignItems="center" gap={1}>
           <WarningAmberOutlinedIcon color="warning" />
           <Typography variant="h6">
-            {title.endsWith('?') ? title : `${title}?`}
+            {formattedTitle}
           </Typography>
         </Box>
       </DialogTitle>

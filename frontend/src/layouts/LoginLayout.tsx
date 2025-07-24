@@ -1,4 +1,3 @@
-// src/layouts/LoginLayout.tsx
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
@@ -14,7 +13,7 @@ export default function LoginLayout() {
         p: 2,
       }}
     >
-      <Outlet /> {/* Aqui será renderizado o LoginPage */}
+      <Outlet />
     </Box>
   );
 }

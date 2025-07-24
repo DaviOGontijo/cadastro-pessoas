@@ -7,7 +7,7 @@ namespace CadastroPessoasApi.DTOs.V2
         [Required(ErrorMessage = "Data de nascimento é obrigatória.")]
         public string Nome { get; set; } = null!;
         public string? Sexo { get; set; }
-        [EmailAddress(ErrorMessage = "E-mail inválido")]
+        //[EmailAddress(ErrorMessage = "E-mail inválido")]
         public string? Email { get; set; }
         [Required(ErrorMessage = "Data de nascimento é obrigatória.")]
         public DateTime DataNascimento { get; set; }

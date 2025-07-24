@@ -1,7 +1,6 @@
-﻿
-# 📋 Cadastro de Pessoas - API .NET 6 + React (v1)
+﻿# 📋 Cadastro de Pessoas - API .NET 6 + React (v1)
 
-Este projeto é uma aplicação fullstack desenvolvida como desafio técnico para cadastro de pessoas físicas e jurídicas, com backend em .NET 6 e frontend em React (a ser implementado na v2).
+Este projeto é uma aplicação fullstack desenvolvida como desafio técnico para cadastro de pessoas físicas, com backend em .NET 6 e frontend em React (a ser implementado na v2).
 
 ---
 
@@ -13,7 +12,6 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 - ✅ Padrões SOLID e Clean Code
 - ✅ DTOs para entrada e saída
 - ✅ Table-per-hierarchy (TPH) com herança
-- ✅ Estrutura separada para Pessoa Física e Jurídica
 - ✅ Separação por camadas (Controllers, Services, Repositories, Validators)
 
 ---
@@ -22,16 +20,13 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 
 ```
 /Models
-  PessoaBase.cs
-  PessoaFisica.cs
-  PessoaJuridica.cs
-/Models/Enums
-  TipoPessoa.cs
+  Pessoa.cs
+  Endereco.cs
+/DTOs
+  CadastroDto.cs
 /DTOs/V1
   PessoaFisicaCreateDtoV1.cs
   PessoaFisicaReadDtoV1.cs
-  PessoaJuridicaCreateDtoV1.cs
-  PessoaJuridicaReadDtoV1.cs
 /DTOs/V2
   PessoaFisicaCreateDtoV2.cs
   PessoaFisicaReadDtoV2.cs
@@ -43,15 +38,14 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 /Services
   IPessoaFisicaServiceV1.cs
   PessoaFisicaServiceV1.cs
-  IPessoaJuridicaServiceV1.cs
-  PessoaJuridicaServiceV1.cs
   IPessoaFisicaServiceV2.cs
   PessoaFisicaServiceV2.cs
-  IPessoaJuridicaServiceV2.cs
-  PessoaJuridicaServiceV2.cs
+  ITokenService.cs
+  TokenService.cs
+/Controllers
+  AuthController.cs
 /Controllers/V1
   PessoaFisicaControllerV1.cs
-  PessoaJuridicaControllerV1.cs
 /Controllers/V2
   PessoaFisicaControllerV2.cs
 /Validators
@@ -62,19 +56,23 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 
 ## 🧠 Funcionalidades
 
+### Autenticação
+- Login (`POST /api/v1/auth/login`)
+- Registro (`POST /api/v1/auth/register`)
 ### Pessoa Física
-- Criar (`POST /api/v1/pessoafisica`)
+## V1
+- - Criar (`POST /api/v1/pessoafisica`)
 - Buscar por ID (`GET /api/v1/pessoafisica/{id}`)
 - Listar todas (`GET /api/v1/pessoafisica`)
 - Atualizar (`PUT /api/v1/pessoafisica/{id}`)
 - Deletar (`DELETE /api/v1/pessoafisica/{id}`)
 
-### Pessoa Jurídica
-- Criar (`POST /api/v1/pessoajuridica`)
-- Buscar por ID (`GET /api/v1/pessoajuridica/{id}`)
-- Listar todas (`GET /api/v1/pessoajuridica`)
-- Atualizar (`PUT /api/v1/pessoajuridica/{id}`)
-- Deletar (`DELETE /api/v1/pessoajuridica/{id}`)
+## V2
+- - Criar (`POST /api/v2/pessoafisica`)
+- Buscar por ID (`GET /api/v2/pessoafisica/{id}`)
+- Listar todas (`GET /api/v2/pessoafisica`)
+- Atualizar (`PUT /api/v2/pessoafisica/{id}`)
+- Deletar (`DELETE /api/v2/pessoafisica/{id}`)
 
 ---
 
@@ -82,7 +80,7 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/DaviOGontijo/cadastro-pessoas-api
+git clone https://github.com/DaviOGontijo/cadastro-pessoas
 cd cadastro-pessoas-api
 ```
 

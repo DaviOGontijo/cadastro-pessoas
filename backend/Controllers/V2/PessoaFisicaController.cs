@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CadastroPessoasApi.Controllers.V2
 {
-    [Authorize]
+    //[Authorize]
+    [AllowAnonymous]
     [ApiController]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]

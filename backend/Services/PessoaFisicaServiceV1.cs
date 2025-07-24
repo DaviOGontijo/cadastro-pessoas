@@ -1,5 +1,4 @@
 ﻿using CadastroPessoasApi.DTOs.V1;
-using CadastroPessoasApi.Models.Enums;
 using CadastroPessoasApi.Models;
 using CadastroPessoasApi.Repositories;
 using CadastroPessoasApi.Validators;
@@ -22,7 +21,7 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
         if (cpfExistente != null)
             return (false, "CPF já cadastrado.", null);
 
-        var pessoa = new PessoaFisica
+        var pessoa = new Pessoa
         {
             Nome = dto.Nome,
             Sexo = dto.Sexo,
@@ -31,7 +30,6 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
             Naturalidade = dto.Naturalidade,
             Nacionalidade = dto.Nacionalidade,
             CPF = dto.CPF,
-            Tipo = TipoPessoa.Fisica,
             DataCadastro = DateTime.UtcNow,
             DataAtualizacao = DateTime.UtcNow
         };

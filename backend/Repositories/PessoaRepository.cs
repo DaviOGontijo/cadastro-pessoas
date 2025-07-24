@@ -13,81 +13,43 @@ namespace CadastroPessoasApi.Repositories
             _context = context;
         }
 
-        public async Task AdicionarPessoaFisica(PessoaFisica pessoaFisica)
+        public async Task AdicionarPessoaFisica(Pessoa pessoa)
         {
-            _context.Pessoas.Add(pessoaFisica);
+            _context.Pessoas.Add(pessoa);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AdicionarPessoaJuridica(PessoaJuridica pessoaJuridica)
-        {
-            _context.Pessoas.Add(pessoaJuridica);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<PessoaFisica?> ObterPessoaFisicaPorId(int id)
+        public async Task<Pessoa?> ObterPessoaFisicaPorId(int id)
         {
             return await _context.Pessoas
-                .OfType<PessoaFisica>()
+                .OfType<Pessoa>()
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<PessoaFisica>> ObterTodasPessoasFisicas()
+        public async Task<IEnumerable<Pessoa>> ObterTodasPessoasFisicas()
         {
             return await _context.Pessoas
-                .OfType<PessoaFisica>()
+                .OfType<Pessoa>()
                 .Include(p => p.Endereco)
                 .ToListAsync();
         }
 
-        public async Task<PessoaJuridica?> ObterPessoaJuridicaPorId(int id)
+        public async Task AtualizarPessoaFisica(Pessoa pessoa)
+        {
+            _context.Pessoas.Update(pessoa);
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeletarPessoaFisica(Pessoa pessoa)
+        {
+            _context.Pessoas.Remove(pessoa);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<Pessoa?> ObterPessoaFisicaPorCpf(string cpf)
         {
             return await _context.Pessoas
-                .OfType<PessoaJuridica>()
-                .Include(p => p.Endereco)
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-        public async Task<IEnumerable<PessoaJuridica>> ObterTodasPessoasJuridicas()
-        {
-            return await _context.Pessoas
-                .OfType<PessoaJuridica>()
-                .Include(p => p.Endereco)
-                .ToListAsync();
-        }
-        public async Task AtualizarPessoaFisica(PessoaFisica pessoaFisica)
-        {
-            _context.Pessoas.Update(pessoaFisica);
-            await _context.SaveChangesAsync();
-        }
-        public async Task AtualizarPessoaJuridica(PessoaJuridica pessoaJuridica)
-        {
-            _context.Pessoas.Update(pessoaJuridica);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeletarPessoaFisica(PessoaFisica pessoaFisica)
-        {
-            _context.Pessoas.Remove(pessoaFisica);
-            await _context.SaveChangesAsync();
-        }
-        public async Task DeletarPessoaJuridica(PessoaJuridica pessoaJuridica)
-        {
-            _context.Pessoas.Remove(pessoaJuridica);
-            await _context.SaveChangesAsync();
-        }
-        public async Task<PessoaFisica?> ObterPessoaFisicaPorCpf(string cpf)
-        {
-            return await _context.Pessoas
-                .OfType<PessoaFisica>()
+                .OfType<Pessoa>()
                 .FirstOrDefaultAsync(p => p.CPF == cpf);
-        }
-        public async Task<PessoaJuridica?> ObterPessoaJuridicaPorCnpj(string cnpj)
-        {
-            return await _context.Pessoas
-                .OfType<PessoaJuridica>()
-                .FirstOrDefaultAsync(p => p.CNPJ == cnpj);
         }
     }
 }

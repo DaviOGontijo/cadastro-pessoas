@@ -1,5 +1,4 @@
 ﻿using CadastroPessoasApi.DTOs.V2;
-using CadastroPessoasApi.Models.Enums;
 using CadastroPessoasApi.Models;
 using CadastroPessoasApi.Repositories;
 using CadastroPessoasApi.Validators;
@@ -32,7 +31,7 @@ public class PessoaFisicaServiceV2 : IPessoaFisicaServiceV2
             CEP = dto.Endereco.CEP
         };
 
-        var pessoa = new PessoaFisica
+        var pessoa = new Pessoa
         {
             Nome = dto.Nome,
             Sexo = dto.Sexo,
@@ -41,7 +40,6 @@ public class PessoaFisicaServiceV2 : IPessoaFisicaServiceV2
             Naturalidade = dto.Naturalidade,
             Nacionalidade = dto.Nacionalidade,
             CPF = dto.CPF,
-            Tipo = TipoPessoa.Fisica,
             DataCadastro = DateTime.UtcNow,
             DataAtualizacao = DateTime.UtcNow,
             Endereco = endereco

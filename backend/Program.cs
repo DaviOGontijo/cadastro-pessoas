@@ -91,18 +91,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin() 
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // Registro de serviços
 builder.Services.AddControllers();
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
 builder.Services.AddScoped<IPessoaFisicaServiceV1, PessoaFisicaServiceV1>();
 builder.Services.AddScoped<IPessoaFisicaServiceV2, PessoaFisicaServiceV2>();
-builder.Services.AddScoped<IPessoaJuridicaServiceV1, PessoaJuridicaServiceV1>();
-builder.Services.AddScoped<IPessoaJuridicaServiceV2, PessoaJuridicaServiceV2>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+app.UseCors("AllowAll");
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

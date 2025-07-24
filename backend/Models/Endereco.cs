@@ -12,8 +12,7 @@
         public string Estado { get; set; } = null!;
         public string CEP { get; set; } = null!;
 
-        // FK para Pessoa
         public int IdPessoa { get; set; }
-        public PessoaBase Pessoa { get; set; } = null!;
+        public Pessoa Pessoa { get; set; } = null!;
     }
 }

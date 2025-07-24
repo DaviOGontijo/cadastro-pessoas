@@ -4,22 +4,16 @@ namespace CadastroPessoasApi.Repositories
 {
     public interface IPessoaRepository
     {
-        Task AdicionarPessoaFisica(PessoaFisica pessoaFisica);
-        Task AdicionarPessoaJuridica(PessoaJuridica pessoaJuridica);
+        Task AdicionarPessoaFisica(Pessoa pessoa);
 
-        Task<PessoaFisica?> ObterPessoaFisicaPorId(int id);
-        Task<IEnumerable<PessoaFisica>> ObterTodasPessoasFisicas();
+        Task<Pessoa?> ObterPessoaFisicaPorId(int id);
+        Task<IEnumerable<Pessoa>> ObterTodasPessoasFisicas();
 
-        Task<PessoaJuridica?> ObterPessoaJuridicaPorId(int id);
-        Task<IEnumerable<PessoaJuridica>> ObterTodasPessoasJuridicas();
 
-        Task AtualizarPessoaFisica(PessoaFisica pessoaFisica);
-        Task AtualizarPessoaJuridica(PessoaJuridica pessoaJuridica);
+        Task AtualizarPessoaFisica(Pessoa pessoa);
 
-        Task DeletarPessoaFisica(PessoaFisica pessoaFisica);
-        Task DeletarPessoaJuridica(PessoaJuridica pessoaJuridica);
+        Task DeletarPessoaFisica(Pessoa pessoa);
 
-        Task<PessoaFisica?> ObterPessoaFisicaPorCpf(string cpf);
-        Task<PessoaJuridica?> ObterPessoaJuridicaPorCnpj(string cnpj);
+        Task<Pessoa?> ObterPessoaFisicaPorCpf(string cpf);
     }
 }

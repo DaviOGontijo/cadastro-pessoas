@@ -57,8 +57,8 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 ## 🧠 Funcionalidades
 
 ### Autenticação
-- Login (`POST /api/v1/auth/login`)
-- Registro (`POST /api/v1/auth/register`)
+- Login (`POST /api/auth/login`)
+- Registro (`POST /api/auth/register`)
 ### Pessoa Física
 ## V1
 - - Criar (`POST /api/v1/pessoafisica`)
@@ -81,7 +81,7 @@ Este projeto é uma aplicação fullstack desenvolvida como desafio técnico par
 ### 1. Clone o repositório
 ```bash
 git clone https://github.com/DaviOGontijo/cadastro-pessoas
-cd cadastro-pessoas-api
+cd backend
 ```
 
 ### 2. Restaure os pacotes

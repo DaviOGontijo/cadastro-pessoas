@@ -2,7 +2,7 @@
 
 namespace CadastroPessoasApi.Validators
 {
-    public static class CpfCnpjValidator
+    public static class CpfValidator
     {
         public static bool ValidarCPF(string cpf)
         {
@@ -21,27 +21,8 @@ namespace CadastroPessoasApi.Validators
             int digito2 = CalcularDigitoVerificador(tempCpf, multiplicador2);
 
             return cpf.EndsWith($"{digito1}{digito2}");
+
         }
-
-        public static bool ValidarCNPJ(string cnpj)
-        {
-            cnpj = SomenteNumeros(cnpj);
-
-            if (cnpj.Length != 14 || TodosDigitosIguais(cnpj))
-                return false;
-
-            var multiplicador1 = new[] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-            var multiplicador2 = new[] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-
-            string tempCnpj = cnpj[..12];
-            int digito1 = CalcularDigitoVerificador(tempCnpj, multiplicador1);
-
-            tempCnpj += digito1;
-            int digito2 = CalcularDigitoVerificador(tempCnpj, multiplicador2);
-
-            return cnpj.EndsWith($"{digito1}{digito2}");
-        }
-
         private static int CalcularDigitoVerificador(string input, int[] multiplicadores)
         {
             int soma = 0;

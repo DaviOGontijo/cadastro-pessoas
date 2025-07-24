@@ -12,48 +12,60 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
         _repository = repository;
     }
 
-    public async Task<(bool Success, string? ErrorMessage, PessoaFisicaReadDtoV1? Result)> CreateAsync(PessoaFisicaCreateDtoV1 dto)
+    public async Task<(bool Success, string ErrorMessage, PessoaFisicaReadDtoV1 Result)> CreateAsync(PessoaFisicaCreateDtoV1 dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.CPF))
+            return (false, "CPF é obrigatório.", null);
+
+        if (!CpfValidator.ValidarCPF(dto.CPF))
+            return (false, "CPF inválido.", null);
+
         var cpfExistente = await _repository.ObterPessoaFisicaPorCpf(dto.CPF);
 
-        if (!CpfCnpjValidator.ValidarCPF(dto.CPF))
-            return (false, "CPF inválido.", null);
         if (cpfExistente != null)
             return (false, "CPF já cadastrado.", null);
 
-        var pessoa = new Pessoa
+        try
         {
-            Nome = dto.Nome,
-            Sexo = dto.Sexo,
-            Email = dto.Email,
-            DataNascimento = dto.DataNascimento,
-            Naturalidade = dto.Naturalidade,
-            Nacionalidade = dto.Nacionalidade,
-            CPF = dto.CPF,
-            DataCadastro = DateTime.UtcNow,
-            DataAtualizacao = DateTime.UtcNow
-        };
+            var pessoa = new Pessoa
+            {
+                Nome = dto.Nome,
+                Sexo = dto.Sexo,
+                Email = dto.Email,
+                DataNascimento = dto.DataNascimento,
+                Naturalidade = dto.Naturalidade,
+                Nacionalidade = dto.Nacionalidade,
+                CPF = dto.CPF,
+                DataCadastro = DateTime.UtcNow,
+                DataAtualizacao = DateTime.UtcNow
+            };
 
-        await _repository.AdicionarPessoaFisica(pessoa);
+            await _repository.AdicionarPessoaFisica(pessoa);
 
-        var result = new PessoaFisicaReadDtoV1
+            var result = new PessoaFisicaReadDtoV1
+            {
+                Id = pessoa.Id,
+                Nome = pessoa.Nome,
+                Sexo = pessoa.Sexo,
+                Email = pessoa.Email,
+                DataNascimento = pessoa.DataNascimento,
+                Naturalidade = pessoa.Naturalidade,
+                Nacionalidade = pessoa.Nacionalidade,
+                CPF = pessoa.CPF,
+                DataCadastro = pessoa.DataCadastro,
+                DataAtualizacao = pessoa.DataAtualizacao
+            };
+
+            return (true, null, result);
+        }
+        catch (Exception ex)
         {
-            Id = pessoa.Id,
-            Nome = pessoa.Nome,
-            Sexo = pessoa.Sexo,
-            Email = pessoa.Email,
-            DataNascimento = pessoa.DataNascimento,
-            Naturalidade = pessoa.Naturalidade,
-            Nacionalidade = pessoa.Nacionalidade,
-            CPF = pessoa.CPF,
-            DataCadastro = pessoa.DataCadastro,
-            DataAtualizacao = pessoa.DataAtualizacao
-        };
-
-        return (true, null, result);
+            return (false, $"Falha ao cadastrar pessoa: {ex.Message}", null);
+        }
     }
 
-    public async Task<PessoaFisicaReadDtoV1?> GetByIdAsync(int id)
+
+    public async Task<PessoaFisicaReadDtoV1> GetByIdAsync(int id)
     {
         var pessoa = await _repository.ObterPessoaFisicaPorId(id);
         if (pessoa == null) return null;
@@ -91,7 +103,7 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
         });
     }
 
-    public async Task<(bool Success, string? ErrorMessage)> UpdateAsync(int id, PessoaFisicaCreateDtoV1 dto)
+    public async Task<(bool Success, string ErrorMessage)> UpdateAsync(int id, PessoaFisicaCreateDtoV1 dto)
     {
         var pessoaExistente = await _repository.ObterPessoaFisicaPorId(id);
         if (pessoaExistente == null)
@@ -100,7 +112,7 @@ public class PessoaFisicaServiceV1 : IPessoaFisicaServiceV1
         var cpfExistente = await _repository.ObterPessoaFisicaPorCpf(dto.CPF);
         if (cpfExistente != null && cpfExistente.Id != id)
             return (false, "CPF já cadastrado para outra pessoa.");
-        if (!CpfCnpjValidator.ValidarCPF(dto.CPF))
+        if (!CpfValidator.ValidarCPF(dto.CPF))
             return (false, "CPF inválido.");
 
         pessoaExistente.Nome = dto.Nome;

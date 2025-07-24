@@ -19,7 +19,7 @@ namespace CadastroPessoasApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Pessoa?> ObterPessoaFisicaPorId(int id)
+        public async Task<Pessoa> ObterPessoaFisicaPorId(int id)
         {
             return await _context.Pessoas
                 .OfType<Pessoa>()
@@ -45,7 +45,7 @@ namespace CadastroPessoasApi.Repositories
             _context.Pessoas.Remove(pessoa);
             await _context.SaveChangesAsync();
         }
-        public async Task<Pessoa?> ObterPessoaFisicaPorCpf(string cpf)
+        public async Task<Pessoa> ObterPessoaFisicaPorCpf(string cpf)
         {
             return await _context.Pessoas
                 .OfType<Pessoa>()

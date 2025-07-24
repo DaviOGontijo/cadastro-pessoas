@@ -32,6 +32,7 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
   const [cpfError, setCpfError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [formTouched, setFormTouched] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (initial) {
@@ -48,6 +49,28 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
 
   const handleChange = (field: keyof Pessoa, value: any) => {
     setForm(prev => ({ ...prev, [field]: value }));
+
+    // Validação em tempo real
+    if (field === 'nome' && !value.trim()) {
+      setErrors(prev => ({ ...prev, nome: 'Nome obrigatório' }));
+    } else if (field === 'dataNascimento' && !value) {
+      setErrors(prev => ({ ...prev, dataNascimento: 'Data obrigatória' }));
+    } else {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+
+    // Validação específica
+    if (field === 'email') {
+      const msg = validateEmail(value);
+      setErrors(prev => ({ ...prev, email: msg }));
+
+    }
+
+    if (field === 'cpf') {
+      const rawCpf = value.replace(/\D/g, '');
+      const msg = validateCPF(rawCpf);
+       setErrors(prev => ({ ...prev, cpf: msg }));
+    }
   };
 
   const handleEnderecoChange = (field: keyof Pessoa['endereco'], value: any) => {
@@ -58,6 +81,15 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
         [field]: value
       }
     }));
+
+    if (
+      ['logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep'].includes(field) &&
+      !value.trim()
+    ) {
+      setErrors(prev => ({ ...prev, [field]: 'Campo obrigatório' }));
+    } else {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const validateForm = (): boolean => {
@@ -81,9 +113,7 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
 
   const resetForm = () => {
     setForm(emptyForm);
-    setFormTouched(false);
-    setCpfError('');
-    setEmailError('');
+
   };
 
   const handleSave = (onSubmit: (data: Pessoa) => void, onClose: () => void) => {
@@ -104,14 +134,14 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
       resetForm();
       onClose();
     } catch (err: any) {
-    if (err.response?.status === 400 && typeof err.response?.data === 'string') {
-      if (err.response.data.includes('CPF')) {
-        setCpfError(err.response.data);
+      if (err.response?.status === 400 && typeof err.response?.data === 'string') {
+        if (err.response.data.includes('CPF')) {
+          setCpfError(err.response.data);
+        } else {
+        }
       } else {
       }
-    } else {
     }
-  }
   };
 
   return {
@@ -119,6 +149,7 @@ export function usePessoaForm(initial?: Partial<Pessoa>) {
     formTouched,
     cpfError,
     emailError,
+    errors,
     handleChange,
     handleEnderecoChange,
     validateForm,

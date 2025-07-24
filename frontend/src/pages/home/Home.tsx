@@ -49,20 +49,25 @@ export default function Pessoas() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [loadingPessoa, setLoadingPessoa] = useState(false);
 
+  function formatCPF(cpf: string): string {
+    const onlyDigits = cpf.replace(/\D/g, '');
+    if (onlyDigits.length !== 11) return cpf;
+    return onlyDigits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
   const columns: Column<PessoaRow>[] = [
     { field: 'id', headerName: 'ID' },
     { field: 'nome', headerName: 'Nome' },
-    { field: 'cpf', headerName: 'CPF' },
+    { field: 'cpf', headerName: 'CPF', render: (value) => formatCPF(value as string) },
     { field: 'email', headerName: 'Email' },
   ];
-
   const onSubmit = async (data: Pessoa) => {
     try {
       await savePessoa(data);
       setOpenDialog(false);
       resetForm();
     } catch {
-      // O erro já é tratado no hook
+      //erro tratado no hook
     }
   };
 

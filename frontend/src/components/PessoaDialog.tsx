@@ -20,7 +20,7 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const {
-    form, formTouched, cpfError, emailError,
+    form, formTouched, cpfError, emailError, errors,
     handleChange, handleEnderecoChange,
     validateForm, handleSave, setCpfError, setEmailError
   } = usePessoaForm(initial);
@@ -45,19 +45,19 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
       <DialogContent dividers>
         <Grid container spacing={2}>
           {/* Nome */}
-          <Grid size ={{xs: 12, sm: 6}}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Nome"
               value={form.nome}
               onChange={e => handleChange('nome', e.target.value)}
               fullWidth required
-              error={formTouched && !form.nome}
-              helperText={formTouched && !form.nome && 'Nome obrigatório'}
+              error={!!errors.nome}
+              helperText={errors.nome}
             />
           </Grid>
 
           {/* Sexo */}
-          <Grid size ={{xs: 12, sm: 3}}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <FormControl fullWidth>
               <InputLabel id="sexo-label">Sexo</InputLabel>
               <Select
@@ -75,7 +75,7 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
           </Grid>
 
           {/* Data de Nascimento */}
-          <Grid size ={{xs: 12, sm: 3}}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               type="date"
               label="Data de Nascimento"
@@ -84,13 +84,13 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
               fullWidth
               InputLabelProps={{ shrink: true }}
               required
-              error={formTouched && !form.dataNascimento}
-              helperText={formTouched && !form.dataNascimento && 'Data obrigatória'}
+              error={!!errors.dataNascimento}
+              helperText={errors.dataNascimento}
             />
           </Grid>
 
           {/* Email */}
-          <Grid size ={{xs: 12, sm: 3}}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               label="Email"
               value={form.email}
@@ -99,13 +99,13 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
                 setEmailError('');
               }}
               fullWidth
-              error={!!emailError}
-              helperText={emailError}
+              error={!!errors.email}
+              helperText={errors.email}
             />
           </Grid>
 
           {/* CPF */}
-          <Grid size ={{xs: 12, sm: 3}}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               label="CPF"
               value={form.cpf}
@@ -114,8 +114,8 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
                 setCpfError('');
               }}
               fullWidth required
-              error={!!cpfError}
-              helperText={cpfError}
+              error={!!errors.cpf}
+              helperText={errors.cpf}
               InputProps={{
                 inputComponent: CPFMaskInput as any
               }}
@@ -123,36 +123,99 @@ export function PessoaDialog({ open, initial, onClose, onSubmit }: Props) {
           </Grid>
 
           {/* Nacionalidade e Naturalidade */}
-          <Grid size ={{xs: 12, sm: 3}}>
-            <TextField label="Nacionalidade" value={form.nacionalidade} onChange={e => handleChange('nacionalidade', e.target.value)} fullWidth />
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <TextField 
+            label="Nacionalidade" 
+            value={form.nacionalidade} 
+            onChange={e => handleChange('nacionalidade', e.target.value)} 
+            fullWidth 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 3}}>
-            <TextField label="Naturalidade" value={form.naturalidade} onChange={e => handleChange('naturalidade', e.target.value)} fullWidth />
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <TextField 
+            label="Naturalidade" 
+            value={form.naturalidade} 
+            onChange={e => handleChange('naturalidade', e.target.value)} 
+            fullWidth 
+            />
           </Grid>
 
-          <Grid size ={{xs: 12}}><strong>Endereço</strong></Grid>
+          <Grid size={{ xs: 12 }}><strong>Endereço</strong></Grid>
 
           {/* Endereço */}
-          <Grid size ={{xs: 12, sm: 6}}>
-            <TextField label="Logradouro" value={form.endereco.logradouro} onChange={e => handleEnderecoChange('logradouro', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField 
+            label="Logradouro" 
+            value={form.endereco.logradouro} 
+            onChange={e => handleEnderecoChange('logradouro', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.logradouro}
+            helperText={errors.logradouro} 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 3}}>
-            <TextField label="Número" value={form.endereco.numero} onChange={e => handleEnderecoChange('numero', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <TextField 
+            label="Número" 
+            value={form.endereco.numero} 
+            onChange={e => handleEnderecoChange('numero', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.numero}
+            helperText={errors.numero} 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 3}}>
-            <TextField label="Complemento" value={form.endereco.complemento} onChange={e => handleEnderecoChange('complemento', e.target.value)} fullWidth />
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <TextField 
+            label="Complemento" 
+            value={form.endereco.complemento} 
+            onChange={e => handleEnderecoChange('complemento', e.target.value)} 
+            fullWidth 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 4}}>
-            <TextField label="Bairro" value={form.endereco.bairro} onChange={e => handleEnderecoChange('bairro', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField 
+            label="Bairro" 
+            value={form.endereco.bairro} 
+            onChange={e => handleEnderecoChange('bairro', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.bairro}
+            helperText={errors.bairro} 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 4}}>
-            <TextField label="Cidade" value={form.endereco.cidade} onChange={e => handleEnderecoChange('cidade', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField 
+            label="Cidade" 
+            value={form.endereco.cidade} 
+            onChange={e => handleEnderecoChange('cidade', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.cidade}
+            helperText={errors.cidade} 
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 2}}>
-            <TextField label="Estado" value={form.endereco.estado} onChange={e => handleEnderecoChange('estado', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 2 }}>
+            <TextField 
+            label="Estado" 
+            value={form.endereco.estado} 
+            onChange={e => handleEnderecoChange('estado', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.estado}
+            helperText={errors.estado}
+            />
           </Grid>
-          <Grid size ={{xs: 12, sm: 2}}>
-            <TextField label="CEP" value={form.endereco.cep} onChange={e => handleEnderecoChange('cep', e.target.value)} fullWidth required />
+          <Grid size={{ xs: 12, sm: 2 }}>
+            <TextField 
+            label="CEP" 
+            value={form.endereco.cep} 
+            onChange={e => handleEnderecoChange('cep', e.target.value)} 
+            fullWidth 
+            required 
+            error={!!errors.cep}
+            helperText={errors.cep}
+            />
           </Grid>
         </Grid>
       </DialogContent>

@@ -168,6 +168,10 @@ export function DataTable<T extends { id: string }>({
             setPage(0);
           }}
           disabled={loading}
+          labelRowsPerPage="Linhas por página"
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}–${to} de ${count !== -1 ? count : `mais de ${to}`}`
+          }
         />
       </Paper>
     </>

@@ -22,13 +22,15 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] CadastroDto dto)
     {
-        var exists = await _context.Users.AnyAsync(u => u.Username == dto.Username);
+        var normalizedUsername = dto.Username.ToLower();
+
+        var exists = await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername);
         if (exists)
             return BadRequest("Usuário já existe.");
 
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        var user = new User { Username = normalizedUsername, Password = hashedPassword };
 
-        var user = new User { Username = dto.Username, Password = hashedPassword };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -39,11 +41,15 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] CadastroDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+        var normalizedUsername = dto.Username.ToLower();
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username.ToLower() == normalizedUsername);
+
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
             return Unauthorized();
 
-        var token = _tokenService.GenerateJwtToken(dto.Username);
+        var token = _tokenService.GenerateJwtToken(user.Username); 
         return Ok(new { Token = token });
     }
 }

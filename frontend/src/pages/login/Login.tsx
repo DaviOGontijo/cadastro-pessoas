@@ -66,7 +66,7 @@ export default function LoginPage() {
           render={({ field }) => (
             <TextField
               {...field}
-              label="Usuário ou E‑mail"
+              label="Usuário"
               fullWidth
               margin="normal"
               error={!!errors.login}

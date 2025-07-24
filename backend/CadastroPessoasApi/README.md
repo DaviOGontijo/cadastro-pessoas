@@ -1,12 +1,12 @@
-﻿# 📋 Cadastro de Pessoas - API .NET 6 + React (v1)
+﻿# 📋 Cadastro de Pessoas - API .NET 9
 
-Este projeto é uma aplicação fullstack desenvolvida como desafio técnico para cadastro de pessoas físicas, com backend em .NET 6 e frontend em React (a ser implementado na v2).
+Este projeto é uma aplicação fullstack desenvolvida como desafio técnico para cadastro de pessoas físicas, com backend em .NET 9.
 
 ---
 
 ## 🚀 Tecnologias utilizadas
 
-- ✅ ASP.NET 6 Web API
+- ✅ ASP.NET 9 Web API
 - ✅ Entity Framework Core + SQLite
 - ✅ Swagger (documentação)
 - ✅ Padrões SOLID e Clean Code

@@ -2,7 +2,7 @@ import { createBrowserRouter} from 'react-router-dom';
 import Home from '../pages/home/Home';
 import MainLayout from '../layouts/MainLayout';
 import LoginPage from '../pages/login/Login';
-import Register from '../pages/register/register';
+import RegisterPage from '../pages/register/register';
 import LoginLayout from '../layouts/LoginLayout';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
       {
         children: [
           { path: 'login', element: <LoginPage /> },
-          { path: 'register', element: <Register /> },
+          { path: 'register', element: <RegisterPage /> },
         ],
       },
     ],

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const http = axios.create({
-  //  baseURL: 'https://cadastropessoasapi.azurewebsites.net/api/v2',
-   baseURL: 'https://localhost:5001/api/v2',
+   baseURL: 'https://cadastropessoasapi.azurewebsites.net/api/v2',
+  //  baseURL: 'https://localhost:5001/api/v2',
   headers: {
     'Content-Type': 'application/json',
   },

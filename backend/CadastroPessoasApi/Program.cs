@@ -15,12 +15,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "cadastro.db");
-var connectionString = $"Data Source={dbPath}";
-
 // Configuração do DbContext com SQLite
-builder.Services.AddDbContext<PessoaDbContext>(options =>
-    options.UseSqlite(connectionString));
+builder.Services.AddDbContext<PessoaDbContext>(options => {
+    options.UseSqlite(builder.Configuration.GetConnectionString("MyDb"));
+});
 
 // Configuração do versionamento de API
 builder.Services.AddApiVersioning(opt =>

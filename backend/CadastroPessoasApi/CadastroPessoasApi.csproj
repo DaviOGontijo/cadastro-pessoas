@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
 	  <ImplicitUsings>enable</ImplicitUsings>
+	  <UserSecretsId>cfa438d3-2178-4503-a529-ab7db34cd8d7</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,5 +31,10 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
   </ItemGroup>
-
+	
+	<ItemGroup>
+		<Content Include="cadastro.db">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

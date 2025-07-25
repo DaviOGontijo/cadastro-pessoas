@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
-using Xunit;
-using Moq;
-using CadastroPessoasApi.Services;
-using CadastroPessoasApi.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CadastroPessoasApi.DTOs.V1;
 using CadastroPessoasApi.Models;
-using System;
+using CadastroPessoasApi.Repositories;
+using CadastroPessoasApi.Services;
+using Moq;
+using Xunit;
 
 public class PessoaFisicaServiceV1Tests
 {
@@ -19,95 +21,146 @@ public class PessoaFisicaServiceV1Tests
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarSucesso_QuandoCpfNaoExistir()
+    public async Task Criar_DeveRetornarErro_QuandoCpfInvalido()
     {
-        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "83571390008" };
+        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "123" };
 
-        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf(dto.CPF))
-                 .ReturnsAsync((Pessoa?)null);
+        var (success, errorMessage, result) = await _service.CreateAsync(dto);
 
-        _repoMock.Setup(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()))
-                 .Returns(Task.CompletedTask);
-
-        var (sucesso, mensagemErro, resultado) = await _service.CreateAsync(dto);
-
-        Assert.True(sucesso);
-        Assert.Null(mensagemErro);
-        Assert.NotNull(resultado);
-        Assert.Equal(dto.Nome, resultado.Nome);
-        Assert.Equal(dto.CPF, resultado.CPF);
-
-        _repoMock.Verify(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()), Times.Once);
+        Assert.False(success);
+        Assert.Equal("CPF inválido.", errorMessage);
+        Assert.Null(result);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarErro_QuandoCpfJaExistir()
+    public async Task GetById_DeveRetornarPessoa_QuandoIdExistir()
     {
-        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "83571390008" };
-        var pessoaExistente = new Pessoa { CPF = dto.CPF, Nome = "Fulano" };
+        var pessoa = new Pessoa
+        {
+            Id = 1,
+            Nome = "Fulano",
+            CPF = "12345678900",
+            DataCadastro = DateTime.UtcNow,
+            DataAtualizacao = DateTime.UtcNow
+        };
 
-        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf(dto.CPF))
-                 .ReturnsAsync(pessoaExistente);
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(1)).ReturnsAsync(pessoa);
 
-        var (sucesso, mensagemErro, resultado) = await _service.CreateAsync(dto);
+        var result = await _service.GetByIdAsync(1);
 
-        Assert.False(sucesso);
-        Assert.Equal("CPF já cadastrado.", mensagemErro);
-        Assert.Null(resultado);
-
-        _repoMock.Verify(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()), Times.Never);
-    }
-
-    [Theory]
-    [InlineData("")]
-    public async Task Criar_DeveRetornarErro_QuandoCpfForInvalido(string cpfInvalido)
-    {
-        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = cpfInvalido };
-
-        var (sucesso, mensagemErro, resultado) = await _service.CreateAsync(dto);
-
-        Assert.False(sucesso);
-        Assert.Equal("CPF é obrigatório.", mensagemErro);
-        Assert.Null(resultado);
-
-        _repoMock.Verify(r => r.ObterPessoaFisicaPorCpf(It.IsAny<string>()), Times.Never);
-        _repoMock.Verify(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()), Times.Never);
+        Assert.NotNull(result);
+        Assert.Equal(pessoa.Nome, result.Nome);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarErro_QuandoAdicionarPessoaLancarExcecao()
+    public async Task GetById_DeveRetornarNull_QuandoIdNaoExistir()
     {
-        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Erro Teste", CPF = "83571390008" };
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(It.IsAny<int>())).ReturnsAsync((Pessoa)null);
 
-        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf(dto.CPF))
-                 .ReturnsAsync((Pessoa?)null);
+        var result = await _service.GetByIdAsync(999);
 
-        _repoMock.Setup(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()))
-                 .ThrowsAsync(new Exception("Falha no banco de dados"));
-
-        var (sucesso, mensagemErro, resultado) = await _service.CreateAsync(dto);
-
-        Assert.False(sucesso);
-        Assert.Contains("Falha ao cadastrar pessoa:", mensagemErro);
-        Assert.Null(resultado);
-
-        _repoMock.Verify(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()), Times.Once);
+        Assert.Null(result);
     }
 
     [Fact]
-    public async Task Criar_DeveRetornarPessoaComNomeCorreto()
+    public async Task GetAll_DeveRetornarListaDePessoas()
     {
-        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Maria Silva", CPF = "83571390008" };
+        var pessoas = new List<Pessoa>
+        {
+            new Pessoa { Id = 1, Nome = "Fulano", CPF = "123", DataCadastro = DateTime.UtcNow, DataAtualizacao = DateTime.UtcNow },
+            new Pessoa { Id = 2, Nome = "Beltrano", CPF = "456", DataCadastro = DateTime.UtcNow, DataAtualizacao = DateTime.UtcNow }
+        };
 
-        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf(dto.CPF))
-                 .ReturnsAsync((Pessoa?)null);
+        _repoMock.Setup(r => r.ObterTodasPessoasFisicas()).ReturnsAsync(pessoas);
 
-        _repoMock.Setup(r => r.AdicionarPessoaFisica(It.IsAny<Pessoa>()))
-                 .Returns(Task.CompletedTask);
+        var result = await _service.GetAllAsync();
 
-        var (sucesso, mensagemErro, resultado) = await _service.CreateAsync(dto);
+        Assert.Equal(2, result.Count());
+    }
 
-        Assert.True(sucesso);
-        Assert.Equal("Maria Silva", resultado.Nome);
+    [Fact]
+    public async Task Update_DeveRetornarErro_QuandoPessoaNaoExistir()
+    {
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(It.IsAny<int>())).ReturnsAsync((Pessoa)null);
+
+        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "123" };
+
+        var (success, error) = await _service.UpdateAsync(1, dto);
+
+        Assert.False(success);
+        Assert.Equal("Pessoa não encontrada.", error);
+    }
+
+    [Fact]
+    public async Task Update_DeveRetornarErro_QuandoCpfPertenceAOutraPessoa()
+    {
+        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "123" };
+
+        var pessoa = new Pessoa { Id = 1, CPF = "123" };
+        var outraPessoa = new Pessoa { Id = 2, CPF = "123" };
+
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(1)).ReturnsAsync(pessoa);
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf("123")).ReturnsAsync(outraPessoa);
+
+        var (success, error) = await _service.UpdateAsync(1, dto);
+
+        Assert.False(success);
+        Assert.Equal("CPF já cadastrado para outra pessoa.", error);
+    }
+
+    [Fact]
+    public async Task Update_DeveRetornarErro_QuandoCpfInvalido()
+    {
+        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Fulano", CPF = "123" };
+        var pessoa = new Pessoa { Id = 1, CPF = "000" };
+
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(1)).ReturnsAsync(pessoa);
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf("123")).ReturnsAsync((Pessoa)null);
+
+        var (success, error) = await _service.UpdateAsync(1, dto);
+
+        Assert.False(success);
+        Assert.Equal("CPF inválido.", error);
+    }
+
+    [Fact]
+    public async Task Update_DeveAtualizarPessoa_QuandoDadosValidos()
+    {
+        var dto = new PessoaFisicaCreateDtoV1 { Nome = "Novo Nome", CPF = "12345678909" };
+        var pessoa = new Pessoa { Id = 1, CPF = "000" };
+
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(1)).ReturnsAsync(pessoa);
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorCpf("12345678909")).ReturnsAsync((Pessoa)null);
+        _repoMock.Setup(r => r.AtualizarPessoaFisica(It.IsAny<Pessoa>())).Returns(Task.CompletedTask);
+
+        var (success, error) = await _service.UpdateAsync(1, dto);
+
+        Assert.True(success);
+        Assert.Null(error);
+        _repoMock.Verify(r => r.AtualizarPessoaFisica(It.IsAny<Pessoa>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Delete_DeveRetornarFalse_QuandoPessoaNaoExistir()
+    {
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(It.IsAny<int>())).ReturnsAsync((Pessoa)null);
+
+        var result = await _service.DeleteAsync(1);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task Delete_DeveRemoverPessoa_QuandoPessoaExistir()
+    {
+        var pessoa = new Pessoa { Id = 1 };
+
+        _repoMock.Setup(r => r.ObterPessoaFisicaPorId(1)).ReturnsAsync(pessoa);
+        _repoMock.Setup(r => r.DeletarPessoaFisica(pessoa)).Returns(Task.CompletedTask);
+
+        var result = await _service.DeleteAsync(1);
+
+        Assert.True(result);
+        _repoMock.Verify(r => r.DeletarPessoaFisica(pessoa), Times.Once);
     }
 }

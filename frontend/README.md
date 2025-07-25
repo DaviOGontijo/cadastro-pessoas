@@ -141,25 +141,9 @@ npm  run  dev
 
   
 
-##  Observações
-
-  
-
-  
-
-- O login é simulado: use usuário `admin` e senha `123456`.
-
-  
+##  Observações  
 
 - A API deve estar rodando em `https://localhost:5001/api/v2`.
-
-  
-
-- O projeto utiliza TypeScript para maior segurança e produtividade.
-
-  
-
-  
 
 ---
 
